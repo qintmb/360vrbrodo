@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="label_download">Downloads</string>
+    <string name="label_vault">Vault</string>
+    <string name="action_save">Save</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="title_settings">Settings</string>
+    <string name="title_search_engines">Search Engines</string>
+</resources>

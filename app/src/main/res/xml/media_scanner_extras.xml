@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<media_scanner>
+    <directory name="vault_hidden" path=".vault" />
+</media_scanner>

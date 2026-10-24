@@ -1,0 +1,106 @@
+plugins {
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    kotlin("plugin.serialization") version "2.3.20"
+}
+
+kotlin {
+    jvmToolchain(libs.versions.jvmToolchain.get().toInt())
+}
+
+android {
+    compileSdk = libs.versions.compileSdk.get().toInt()
+    namespace = "com.elbruz.vrvideo"
+
+    defaultConfig {
+        applicationId = "com.elbruz.vrvideo"
+        minSdk = libs.versions.minSdk.get().toInt()
+        targetSdk = libs.versions.targetSdk.get().toInt()
+        versionCode = 1
+        versionName = "0.1.0"
+
+        vectorDrawables {
+            useSupportLibrary = true
+        }
+
+        ndk {
+            abiFilters += listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
+        }
+    }
+
+    buildFeatures {
+        viewBinding = true
+        buildConfig = true
+    }
+
+    buildTypes {
+        debug {
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+        release {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+        }
+    }
+}
+
+dependencies {
+    // Core
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.webkit)
+    implementation(libs.material)
+    implementation(libs.androidx.activity.ktx)
+    implementation(libs.lifecycle.viewmodel.ktx)
+
+    // Image loading
+    implementation(libs.coil)
+
+    // Media / playback — handles standard + 360° spherical video
+    implementation(libs.media3.exoplayer)
+    implementation(libs.media3.ui)
+    implementation(libs.media3.datasource.okhttp)
+    implementation(libs.media3.common)
+
+    // yt-dlp + ffmpeg for fast segmented downloads
+    implementation(libs.youtubedl)
+    implementation(libs.youtubedl.ffmpeg)
+
+    // Networking
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.logging)
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.gson)
+    implementation(libs.jsoup)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.kotlinx.serialization.core)
+
+    // Persistence
+    implementation(libs.datastore)
+    implementation(libs.androidx.work.runtime.ktx)
+
+    // Testing
+    testImplementation(libs.junit)
+    testImplementation(libs.mockito)
+    androidTestImplementation(libs.androidx.test.junit)
+    androidTestImplementation(libs.androidx.test.espresso)
+}

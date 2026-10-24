@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ===== COLORS — Light variant (for completeness) ===== -->
+    <color name="md_theme_primary">#00C853</color>
+    <color name="md_theme_onPrimary">#FFFFFF</color>
+    <color name="md_theme_primaryContainer">#B8F1D1</color>
+    <color name="md_theme_onPrimaryContainer">#003313</color>
+    <color name="md_theme_secondary">#00BCD4</color>
+    <color name="md_theme_onSecondary">#000000</color>
+    <color name="md_theme_secondaryContainer">#67F0FF</color>
+    <color name="md_theme_background">#FFFFFF</color>
+    <color name="md_theme_onBackground">#121212</color>
+    <color name="md_theme_surface">#FEFEFE</color>
+    <color name="md_theme_onSurface">#121212</color>
+    <color name="md_theme_surfaceVariant">#E7E7E7</color>
+    <color name="md_theme_onSurfaceVariant">#424242</color>
+    <color name="md_theme_outline">#CAC4D0</color>
+    <color name="status_bar_scramble">#000000</color>
+</resources>

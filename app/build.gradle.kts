@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -8,9 +10,29 @@ kotlin {
     jvmToolchain(libs.versions.jvmToolchain.get().toInt())
 }
 
+// ---- Release signing: reads keystore.properties (gitignored) ----
+val keystorePropsFile = rootProject.file("keystore.properties")
+val keystoreProps = Properties().apply {
+    if (keystorePropsFile.exists()) {
+        keystorePropsFile.inputStream().use { load(it) }
+    }
+}
+val hasReleaseKeystore = keystoreProps.getProperty("storeFile") != null
+
 android {
     compileSdk = libs.versions.compileSdk.get().toInt()
     namespace = "com.elbruz.vrvideo"
+
+    signingConfigs {
+        if (hasReleaseKeystore) {
+            create("release") {
+                storeFile = file(keystoreProps.getProperty("storeFile"))
+                storePassword = keystoreProps.getProperty("storePassword")
+                keyAlias = keystoreProps.getProperty("keyAlias")
+                keyPassword = keystoreProps.getProperty("keyPassword")
+            }
+        }
+    }
 
     defaultConfig {
         applicationId = "com.elbruz.vrvideo"
@@ -24,7 +46,9 @@ android {
         }
 
         ndk {
-            abiFilters += listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
+            // arm64-only release: modern devices incl. all MediaTek Helio G/Dimensity.
+            // Keeps APK small (single ABI of ffmpeg+python native libs).
+            abiFilters += listOf("arm64-v8a")
         }
     }
 
@@ -48,6 +72,9 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            if (hasReleaseKeystore) {
+                signingConfig = signingConfigs.getByName("release")
+            }
         }
     }
 

@@ -20,8 +20,6 @@ class VrJsInterface(
 ) {
     companion object { private const val TAG = "VrJsInterface" }
 
-    private val webView: WebView get() = activity.webView
-
     /** Called from JS: receive detected video URLs. */
     @JavascriptInterface
     fun onVideosFound(videoJsonArray: String) {
@@ -42,8 +40,9 @@ class VrJsInterface(
         }
     }
 
-    /** Inject the scanner into the current page. */
-    fun injectScanner() {
+    /** Inject the scanner into the given WebView (defaults to active tab). */
+    fun injectScanner(target: WebView? = null) {
+        val webView = target ?: activity.tabManager.activeTab?.webView ?: return
         webView.evaluateJavascript(SCANNER_JS, null)
     }
 

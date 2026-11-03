@@ -12,6 +12,34 @@
         android:layout_height="match_parent"
         android:layout_gravity="center"
         app:use_controller="true"
-        app:surface_type="texture_view" />
+        app:surface_type="surface_view" />
+
+    <!-- VR mode indicator -->
+    <TextView
+        android:id="@+id/vrIndicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|center_horizontal"
+        android:layout_marginTop="48dp"
+        android:background="#80000000"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="6dp"
+        android:text="@string/vr_mode_on"
+        android:textColor="@android:color/white"
+        android:textSize="12sp"
+        android:visibility="gone" />
+
+    <!-- VR toggle button (shown for 360 videos) -->
+    <ImageButton
+        android:id="@+id/btnVrToggle"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="80dp"
+        android:background="#80000000"
+        android:src="@android:drawable/ic_menu_view"
+        android:contentDescription="@string/toggle_vr_mode"
+        android:visibility="gone" />
 
 </FrameLayout>

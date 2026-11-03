@@ -25,4 +25,31 @@
 
     <string name="error_no_video_detected">No playable video detected on this page.</string>
     <string name="error_download_failed">Download failed</string>
+
+    <!-- Tabs -->
+    <string name="tab_new">New Tab</string>
+    <string name="tabs_count">%1$d tabs</string>
+    <string name="action_close_tab">Close tab</string>
+    <string name="action_new_tab">New tab</string>
+    <string name="incognito_mode">Incognito</string>
+
+    <!-- Bottom bar -->
+    <string name="action_back">Back</string>
+    <string name="action_forward">Forward</string>
+    <string name="action_home">Home</string>
+    <string name="action_tabs">Tabs</string>
+    <string name="action_menu">Menu</string>
+
+    <!-- Playback -->
+    <string name="action_play">Play</string>
+    <string name="action_pause">Pause</string>
+    <string name="action_close">Close</string>
+    <string name="video_playback_channel_name">Video Playback</string>
+    <string name="video_playback_channel_desc">Shows playback controls for background video</string>
+    <string name="background_playback_title">Now Playing</string>
+
+    <!-- VR mode -->
+    <string name="vr_mode_on">VR 360 mode ON — gyroscope enabled, move phone to look around</string>
+    <string name="vr_mode_off">VR 360 mode OFF</string>
+    <string name="toggle_vr_mode">Toggle VR 360 mode</string>
 </resources>

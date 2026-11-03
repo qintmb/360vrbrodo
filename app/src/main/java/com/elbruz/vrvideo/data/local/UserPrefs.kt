@@ -79,4 +79,12 @@ class UserPrefs private constructor(private val context: Context) {
     suspend fun getBoolean(key: androidx.datastore.preferences.core.Preferences.Key<Boolean>, default: Boolean = false): Boolean {
         return context.dataStore.data.map { it[key] ?: default }.first()
     }
+
+    suspend fun getString(key: androidx.datastore.preferences.core.Preferences.Key<String>, default: String = ""): String {
+        return context.dataStore.data.map { it[key] ?: default }.first()
+    }
+
+    suspend fun setString(key: androidx.datastore.preferences.core.Preferences.Key<String>, value: String) {
+        context.dataStore.edit { it[key] = value }
+    }
 }

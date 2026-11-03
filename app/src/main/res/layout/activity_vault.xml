@@ -4,114 +4,135 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="?attr/colorSurface"
-    android:fitsSystemWindows="true">
+    android:background="?attr/colorSurface">
 
-    <!-- Header: title + view mode toggle -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:padding="16dp">
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/nav_vault"
-            android:textColor="?attr/colorOnSurface"
-            android:textSize="22sp"
-            android:textStyle="bold" />
-
-        <ImageButton
-            android:id="@+id/btnViewMode"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_list"
-            android:contentDescription="@string/vault_toggle_view"
-            android:padding="10dp" />
-
-        <ImageButton
-            android:id="@+id/btnSort"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_sort"
-            android:contentDescription="@string/vault_sort"
-            android:padding="10dp" />
-    </LinearLayout>
-
-    <!-- Filter chips -->
-    <com.google.android.material.chip.ChipGroup
-        android:id="@+id/chipFilters"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingHorizontal="16dp"
-        android:paddingBottom="8dp"
-        app:singleSelection="true"
-        app:selectionRequired="true">
-
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chipAll"
-            style="@style/Widget.Material3.Chip.Filter"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="true"
-            android:text="@string/vault_filter_all" />
-
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chipVr"
-            style="@style/Widget.Material3.Chip.Filter"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/vault_filter_vr" />
-
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chipFlat"
-            style="@style/Widget.Material3.Chip.Filter"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/vault_filter_flat" />
-    </com.google.android.material.chip.ChipGroup>
-
-    <FrameLayout
-        android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:background="?attr/colorSurface"
+        android:fitsSystemWindows="true">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvVault"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:paddingHorizontal="12dp"
-            android:clipToPadding="false" />
-
+        <!-- Header: title + view mode toggle -->
         <LinearLayout
-            android:id="@+id/emptyView"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:visibility="gone">
-
-            <ImageView
-                android:layout_width="72dp"
-                android:layout_height="72dp"
-                android:src="@drawable/ic_vault"
-                android:alpha="0.4"
-                android:contentDescription="@string/nav_vault" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:padding="16dp">
 
             <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/nav_vault"
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <ImageButton
+                android:id="@+id/btnViewMode"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_list"
+                android:contentDescription="@string/vault_toggle_view"
+                android:padding="10dp" />
+
+            <ImageButton
+                android:id="@+id/btnSort"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_sort"
+                android:contentDescription="@string/vault_sort"
+                android:padding="10dp" />
+        </LinearLayout>
+
+        <!-- Filter chips -->
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipFilters"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="16dp"
+            android:paddingBottom="8dp"
+            app:singleSelection="true"
+            app:selectionRequired="true">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipAll"
+                style="@style/Widget.Material3.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="@string/vault_empty"
-                android:textColor="?attr/colorOnSurfaceVariant"
-                android:textSize="15sp" />
-        </LinearLayout>
-    </FrameLayout>
+                android:checked="true"
+                android:text="@string/vault_filter_all" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipVr"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/vault_filter_vr" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipFlat"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/vault_filter_flat" />
+        </com.google.android.material.chip.ChipGroup>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvVault"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingHorizontal="12dp"
+                android:clipToPadding="false" />
+
+            <LinearLayout
+                android:id="@+id/emptyView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:visibility="gone">
+
+                <ImageView
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:src="@drawable/ic_vault"
+                    android:alpha="0.4"
+                    android:contentDescription="@string/nav_vault" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="@string/vault_empty"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:textSize="15sp" />
+            </LinearLayout>
+        </FrameLayout>
+
+    </LinearLayout>
+
+    <!-- Persistent bottom nav -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNav"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorSurface"
+        app:menu="@menu/bottom_nav_menu"
+        app:itemIconTint="?attr/colorOnSurfaceVariant"
+        app:itemTextColor="?attr/colorOnSurfaceVariant"
+        app:labelVisibilityMode="labeled"
+        app:itemRippleColor="@color/md_theme_primary" />
 
 </LinearLayout>

@@ -13,11 +13,15 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.elbruz.vrvideo.R
+import com.elbruz.vrvideo.ui.main.MainActivity
+import com.elbruz.vrvideo.ui.main.download.DownloadsActivity
 import com.elbruz.vrvideo.ui.main.player.VideoPlayerActivity
+import com.elbruz.vrvideo.ui.main.settings.SettingsActivity
 import com.elbruz.vrvideo.vault.VaultRepository
 import com.elbruz.vrvideo.vault.VaultRepository.Filter
 import com.elbruz.vrvideo.vault.VaultRepository.Sort
 import com.elbruz.vrvideo.vault.VaultRepository.VaultFile
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.chip.Chip
 import kotlinx.coroutines.launch
 
@@ -57,6 +61,27 @@ class VaultActivity : ComponentActivity() {
         findViewById<Chip>(R.id.chipAll).setOnClickListener { applyFilter(Filter.ALL) }
         findViewById<Chip>(R.id.chipVr).setOnClickListener { applyFilter(Filter.VR360) }
         findViewById<Chip>(R.id.chipFlat).setOnClickListener { applyFilter(Filter.FLAT) }
+
+        setupBottomNav()
+    }
+
+    private fun setupBottomNav() {
+        val nav = findViewById<BottomNavigationView>(R.id.bottomNav)
+        nav.selectedItemId = R.id.navVault
+        nav.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.navBrowser -> { switchTo(MainActivity::class.java); true }
+                R.id.navDownloader -> { switchTo(DownloadsActivity::class.java); true }
+                R.id.navVault -> true
+                R.id.navSettings -> { switchTo(SettingsActivity::class.java); true }
+                else -> false
+            }
+        }
+    }
+
+    private fun switchTo(cls: Class<*>) {
+        startActivity(Intent(this, cls).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT))
+        finish()
     }
 
     override fun onResume() {

@@ -27,8 +27,8 @@ import com.elbruz.vrvideo.R
 import com.elbruz.vrvideo.adblock.AdBlocker
 import com.elbruz.vrvideo.data.local.UserPrefs
 import com.elbruz.vrvideo.databinding.ActivityMainBinding
-import com.elbruz.vrvideo.ui.main.settings.SettingsActivity
 import com.elbruz.vrvideo.ui.main.download.DownloadsActivity
+import com.elbruz.vrvideo.ui.main.settings.SettingsActivity
 import com.elbruz.vrvideo.ui.main.vault.VaultActivity
 import com.elbruz.vrvideo.ui.tabs.TabManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -202,6 +202,10 @@ class MainActivity : ComponentActivity(), TabManager.TabFactory {
                 }
                 R.id.navVault -> {
                     startActivity(android.content.Intent(this, VaultActivity::class.java))
+                    true
+                }
+                R.id.navSettings -> {
+                    startActivity(android.content.Intent(this, SettingsActivity::class.java))
                     true
                 }
                 else -> false

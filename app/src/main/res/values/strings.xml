@@ -37,6 +37,7 @@
     <string name="nav_browser">Browser</string>
     <string name="nav_downloader">Downloader</string>
     <string name="nav_vault">Vault</string>
+    <string name="nav_settings">Settings</string>
 
     <!-- Vault -->
     <string name="vault_toggle_view">Toggle grid/list view</string>
@@ -49,10 +50,42 @@
     <string name="vault_share">Share</string>
     <string name="vault_open">Open</string>
     <string name="vault_deleted">Deleted</string>
+    <string name="vault_hidden">Hidden Vault (private, .nomedia)</string>
+    <string name="vault_public">Public Movies/360VR (visible in Gallery)</string>
+    <string name="vault_storage_desc">Choose where new downloads are saved by default</string>
+
     <string name="sort_newest">Newest first</string>
     <string name="sort_largest">Largest first</string>
     <string name="sort_name">Name (A–Z)</string>
     <string name="sort_duration">Longest first</string>
+
+    <!-- Settings -->
+    <string name="settings_search_engines">Search Engines</string>
+    <string name="settings_adblock">AdBlocker</string>
+    <string name="settings_adblock_enable">Block ads &amp; trackers</string>
+    <string name="settings_adblock_status">Loaded 89,054 domains from blocklist</string>
+    <string name="settings_adblock_disabled">AdBlocker disabled</string>
+    <string name="settings_dns">DNS Provider</string>
+    <string name="settings_dns_desc">Custom DNS for privacy &amp; security</string>
+    <string name="settings_theme">Theme</string>
+    <string name="settings_vault">Vault Storage</string>
+    <string name="downloader_empty">No downloads yet</string>
+    <string name="downloader_add_url">Add URL</string>
+    <string name="theme_system">System default</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+
+    <!-- DNS providers -->
+    <string-array name="dns_providers">
+        <item>System Default</item>
+        <item>Google DNS (8.8.8.8)</item>
+        <item>Cloudflare DNS (1.1.1.1)</item>
+        <item>Quad9 DNS (9.9.9.9)</item>
+        <item>NextDNS</item>
+        <item>AdGuard DNS (94.140.14.14)</item>
+        <item>OpenDNS (208.67.222.222)</item>
+        <item>Custom</item>
+    </string-array>
 
     <string name="action_back">Back</string>
     <string name="action_forward">Forward</string>

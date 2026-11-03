@@ -38,8 +38,8 @@ android {
         applicationId = "com.elbruz.vrvideo"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
-        versionCode = 3
-        versionName = "0.3.0"
+        versionCode = 4
+        versionName = "0.4.0"
 
         vectorDrawables {
             useSupportLibrary = true
@@ -49,7 +49,11 @@ android {
             // arm64-only release: modern devices incl. all MediaTek Helio G/Dimensity.
             // Keeps APK small (single ABI of ffmpeg+python native libs).
             // Debug builds also include x86_64 for emulator testing.
-            abiFilters += listOf("arm64-v8a", "x86_64")
+            abiFilters += if (gradle.startParameter.taskNames.any { it.contains("Release", true) }) {
+                listOf("arm64-v8a")
+            } else {
+                listOf("arm64-v8a", "x86_64")
+            }
         }
     }
 

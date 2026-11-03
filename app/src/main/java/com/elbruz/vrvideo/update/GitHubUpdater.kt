@@ -45,7 +45,7 @@ object GitHubUpdater {
         val scope = CoroutineScope(Dispatchers.IO)
         scope.launch {
             try {
-                val release = fetchLatestRelease()
+                val release = fetchLatestReleaseInternal()
                 if (release == null) {
                     withContext(Dispatchers.Main) { onUpToDate?.invoke() }
                     return@launch
@@ -60,6 +60,9 @@ object GitHubUpdater {
             }
         }
     }
+
+    /** Internal fetch, reusable by UpdateWorker (background periodic check). */
+    fun fetchLatestReleaseInternal(): ReleaseInfo? = fetchLatestRelease()
 
     private fun fetchLatestRelease(): ReleaseInfo? {
         val conn = URL(RELEASES_API).openConnection() as HttpURLConnection

@@ -2,6 +2,7 @@ package com.elbruz.vrvideo.ui.main
 
 import android.annotation.SuppressLint
 import android.app.Dialog
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -76,6 +77,16 @@ class MainActivity : ComponentActivity(), TabManager.TabFactory {
         } else {
             tabManager.restoreState(savedInstanceState)
             if (tabManager.count == 0) tabManager.newTab(url = intentUrl ?: "https://www.google.com")
+        }
+        if (intent?.getBooleanExtra(EXTRA_OPEN_UPDATE_DIALOG, false) == true) {
+            checkForUpdate()
+        }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        if (intent.getBooleanExtra(EXTRA_OPEN_UPDATE_DIALOG, false)) {
+            checkForUpdate()
         }
     }
 
@@ -269,7 +280,11 @@ class MainActivity : ComponentActivity(), TabManager.TabFactory {
         if (isFinishing) tabManager.destroy()
     }
 
-    // --- Tab Switcher Adapter ---
+    companion object {
+        /** Extra set by UpdateWorker notification to open the update dialog. */
+        const val EXTRA_OPEN_UPDATE_DIALOG = "extra_open_update_dialog"
+    }
+
     private class TabSwitcherAdapter(
         private val context: MainActivity,
         private val tabs: List<TabManager.TabMeta>,

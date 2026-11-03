@@ -3,6 +3,7 @@ package com.elbruz.vrvideo.ui.main
 import android.util.Log
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
+import com.elbruz.vrvideo.adblock.AdBlocker
 import com.elbruz.vrvideo.ui.main.download.DownloadPromptDialog
 import org.json.JSONArray
 import org.json.JSONObject
@@ -26,7 +27,7 @@ class VrJsInterface(
         activity.runOnUiThread {
             val list = parseVideoItems(videoJsonArray)
             if (list.isNotEmpty()) {
-                DownloadPromptDialog.show(activity, list)
+                activity.onVideosDetected(list)
             }
         }
     }
@@ -44,6 +45,17 @@ class VrJsInterface(
     fun injectScanner(target: WebView? = null) {
         val webView = target ?: activity.tabManager.activeTab?.webView ?: return
         webView.evaluateJavascript(SCANNER_JS, null)
+    }
+
+    /** Inject adblock element-hiding CSS using JSON-encoded string (safe escaping). */
+    fun injectAdblockCss(target: WebView? = null) {
+        val webView = target ?: activity.tabManager.activeTab?.webView ?: return
+        val css = AdBlocker.get(activity).getElementHidingCss()
+        val escaped = org.json.JSONObject.quote(css)
+        webView.evaluateJavascript(
+            "(function(){var s=document.createElement('style');s.textContent=$escaped;(document.head||document.documentElement).appendChild(s);})();",
+            null
+        )
     }
 
     private fun parseVideoItems(json: String): List<VideoItem> {

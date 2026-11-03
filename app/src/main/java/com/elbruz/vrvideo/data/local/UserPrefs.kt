@@ -1,17 +1,19 @@
 package com.elbruz.vrvideo.data.local
 
 import android.content.Context
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.elbruz.vrvideo.model.SearchEngine
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 /**
  * Lightweight preference store using Jetpack DataStore.
  * Stores: last visited URL, active search-engine id, the list of
- * search engines (JSON-serialized).
+ * search engines (JSON-serialized), and boolean flags.
  */
 private val Context.dataStore by preferencesDataStore(name = "user_prefs")
 
@@ -57,9 +59,10 @@ class UserPrefs private constructor(private val context: Context) {
     }
 
     companion object {
-        private val KEY_LAST_URL = stringPreferencesKey("last_url")
-        private val KEY_ENGINES_JSON = stringPreferencesKey("engines_json")
-        private val KEY_CURRENT_ENGINE = stringPreferencesKey("current_engine")
+        val KEY_LAST_URL = stringPreferencesKey("last_url")
+        val KEY_ENGINES_JSON = stringPreferencesKey("engines_json")
+        val KEY_CURRENT_ENGINE = stringPreferencesKey("current_engine")
+        val KEY_ADBLOCK_ENABLED = booleanPreferencesKey("adblock_enabled")
 
         @Volatile private var INSTANCE: UserPrefs? = null
 
@@ -67,5 +70,13 @@ class UserPrefs private constructor(private val context: Context) {
             INSTANCE ?: synchronized(this) {
                 INSTANCE ?: UserPrefs(context.applicationContext).also { INSTANCE = it }
             }
+    }
+
+    suspend fun setBoolean(key: androidx.datastore.preferences.core.Preferences.Key<Boolean>, value: Boolean) {
+        context.dataStore.edit { it[key] = value }
+    }
+
+    suspend fun getBoolean(key: androidx.datastore.preferences.core.Preferences.Key<Boolean>, default: Boolean = false): Boolean {
+        return context.dataStore.data.map { it[key] ?: default }.first()
     }
 }

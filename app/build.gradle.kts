@@ -48,7 +48,8 @@ android {
         ndk {
             // arm64-only release: modern devices incl. all MediaTek Helio G/Dimensity.
             // Keeps APK small (single ABI of ffmpeg+python native libs).
-            abiFilters += listOf("arm64-v8a")
+            // Debug builds also include x86_64 for emulator testing.
+            abiFilters += listOf("arm64-v8a", "x86_64")
         }
     }
 

@@ -52,4 +52,5 @@
     <string name="vr_mode_on">VR 360 mode ON — gyroscope enabled, move phone to look around</string>
     <string name="vr_mode_off">VR 360 mode OFF</string>
     <string name="toggle_vr_mode">Toggle VR 360 mode</string>
+    <string name="site_security">Site security</string>
 </resources>

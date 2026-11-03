@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@android:color/transparent"
+    android:padding="8dp">
+
+    <!-- Thumbnail placeholder -->
+    <FrameLayout
+        android:id="@+id/tabThumbnail"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_margin="4dp"
+        android:background="?attr/colorSurfaceVariant"
+        android:foreground="?attr/selectableItemBackground">
+
+        <ImageView
+            android:id="@+id/incognitoBadge"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="top|end"
+            android:layout_margin="8dp"
+            android:src="@android:drawable/ic_lock_lock"
+            android:tint="@color/md_theme_onPrimary"
+            android:visibility="gone" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/tabTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:ellipsize="end"
+        android:maxLines="2"
+        android:textColor="?attr/colorOnSurface"
+        android:textSize="13sp" />
+
+    <ImageView
+        android:id="@+id/tabClose"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_gravity="end"
+        android:layout_margin="4dp"
+        android:src="@android:drawable/ic_menu_close_clear_cancel"
+        android:tint="?attr/colorOnSurfaceVariant" />
+
+</LinearLayout>

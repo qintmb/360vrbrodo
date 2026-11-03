@@ -50,7 +50,8 @@ class VrJsInterface(
     /** Inject adblock element-hiding CSS using JSON-encoded string (safe escaping). */
     fun injectAdblockCss(target: WebView? = null) {
         val webView = target ?: activity.tabManager.activeTab?.webView ?: return
-        val css = AdBlocker.get(activity).getElementHidingCss()
+        val css = AdBlocker.get(activity).getElementHidingCss(webView.url)
+        if (css.isBlank()) return
         val escaped = org.json.JSONObject.quote(css)
         webView.evaluateJavascript(
             "(function(){var s=document.createElement('style');s.textContent=$escaped;(document.head||document.documentElement).appendChild(s);})();",

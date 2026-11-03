@@ -113,19 +113,19 @@ class AdBlocker private constructor(
     }
 
     /** Get element hiding CSS for injection into pages */
-    fun getElementHidingCss(): String {
-        // Minimal set of common ad container selectors
+    fun getElementHidingCss(url: String? = null): String {
+        // Never inject ad-hiding CSS into YouTube — it uses custom ad player modules
+        // and greedy [class*="ad-"] rules hide the actual video element.
+        val host = url?.let { extractHost(it) } ?: ""
+        if (host.contains("youtube.com") || host.contains("youtu.be")) {
+            return ""
+        }
         return """
-            /* AdGuard-style element hiding */
-            .ads, .ad, .advert, .advertising, .advertisement,
-            .banner, .banner-ad, .banner_ads, .sponsor, .sponsored,
-            [id*="ad-"], [id*="ad_"], [class*="ad-"], [class*="ad_"],
-            [id^="google_ads"], [id^="ads_"], [class^="adsbygoogle"],
+            .ads, .advert, .advertising,
             .adsbygoogle, .gpt-ad, .dfp-ad, #google_ads_div,
             .ad-container, .ad-slot, .ad-wrapper, .ad-placeholder,
             iframe[src*="doubleclick"], iframe[src*="googlesyndication"],
-            iframe[src*="adsystem"], iframe[src*="advertising"],
-            [data-ad-client], [data-ad-slot], .ad-banner
+            iframe[src*="adsystem"], iframe[src*="advertising"]
             { display: none !important; visibility: hidden !important; opacity: 0 !important; height: 0 !important; width: 0 !important; }
         """.trimIndent()
     }

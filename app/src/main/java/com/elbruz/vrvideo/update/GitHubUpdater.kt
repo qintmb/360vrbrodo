@@ -97,16 +97,23 @@ object GitHubUpdater {
     fun downloadAndInstall(context: Context, release: ReleaseInfo) {
         val dm = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
         val fileName = "360vr-${release.versionName}.apk"
+
+        // App-internal folder: not visible in gallery/system Downloads, and
+        // avoids FileUriExposedException when opening the install intent.
+        val destDir = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)
+            ?: context.filesDir
+        val destFile = File(destDir, fileName)
+
         val request = DownloadManager.Request(Uri.parse(release.apkUrl)).apply {
             setTitle(fileName)
-            setDescription("Downloading update…")
+            setDescription("Mengunduh update ${release.versionName}...")
             setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-            setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName)
+            setDestinationUri(Uri.fromFile(destFile))
             setMimeType("application/vnd.android.package-archive")
         }
         val downloadId = dm.enqueue(request)
 
-        // Install when download finishes
+        // Install when download finishes.
         context.registerReceiver(object : BroadcastReceiver() {
             override fun onReceive(ctx: Context, intent: Intent) {
                 if (intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1) != downloadId) return
@@ -114,9 +121,10 @@ object GitHubUpdater {
                 dm.query(query)?.use { cursor ->
                     if (cursor.moveToFirst()) {
                         val status = cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS))
-                        if (status == DownloadManager.STATUS_SUCCESSFUL) {
-                            val localUri = cursor.getString(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_LOCAL_URI))
-                            localUri?.let { installApk(ctx, Uri.parse(it)) }
+                        if (status == DownloadManager.STATUS_SUCCESSFUL && destFile.exists()) {
+                            installApk(ctx, destFile)
+                        } else {
+                            Toast.makeText(ctx, "Update gagal diunduh", Toast.LENGTH_LONG).show()
                         }
                     }
                 }
@@ -124,22 +132,22 @@ object GitHubUpdater {
             }
         }, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
 
-        Toast.makeText(context, "Downloading update ${release.versionName}…", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, "Mengunduh update ${release.versionName}...", Toast.LENGTH_LONG).show()
     }
 
-    private fun installApk(context: Context, uri: Uri) {
+    private fun installApk(context: Context, file: File) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
             !context.packageManager.canRequestPackageInstalls()
         ) {
-            // Prompt user to allow installs from this app
             val intent = Intent(android.provider.Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES)
                 .setData(Uri.parse("package:${context.packageName}"))
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             context.startActivity(intent)
-            Toast.makeText(context, "Allow install permission, then tap the APK again", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, "Izinkan instal dari app ini, lalu buka lagi Update", Toast.LENGTH_LONG).show()
             return
         }
         try {
+            val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
             val intent = Intent(Intent.ACTION_VIEW).apply {
                 setDataAndType(uri, "application/vnd.android.package-archive")
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
@@ -147,7 +155,7 @@ object GitHubUpdater {
             }
             context.startActivity(intent)
         } catch (e: Exception) {
-            Toast.makeText(context, "Install failed: ${e.message}", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, "Instal gagal: ${e.message}", Toast.LENGTH_LONG).show()
         }
     }
 

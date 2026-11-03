@@ -117,17 +117,27 @@
             android:layout_height="0dp"
             android:layout_weight="1" />
 
-        <!-- Floating Video Download Pill (ClintBrowser style) - Draggable -->
-        <com.google.android.material.button.MaterialButton
+        <!-- Fullscreen video overlay (WebChromeClient.onShowCustomView) -->
+        <FrameLayout
+            android:id="@+id/fullscreenVideoContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/black"
+            android:visibility="gone" />
+
+        <!-- Floating Video Download Pill (icon-only circular, draggable) -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/btnFloatingDownload"
-            android:layout_width="wrap_content"
-            android:layout_height="48dp"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
             android:layout_gravity="end|bottom"
             android:layout_marginEnd="16dp"
-            android:layout_marginBottom="100dp"
-            android:text="@string/action_download"
-            app:icon="@drawable/ic_download"
-            app:cornerRadius="24dp"
+            android:layout_marginBottom="80dp"
+            android:src="@drawable/ic_download"
+            android:contentDescription="@string/action_download"
+            app:backgroundTint="?attr/colorPrimary"
+            app:tint="@color/md_theme_onPrimary"
+            app:elevation="6dp"
             android:visibility="gone" />
 
     </LinearLayout>

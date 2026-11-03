@@ -149,6 +149,35 @@ class MainActivity : ComponentActivity(), TabManager.TabFactory {
                 super.onReceivedTitle(view, title)
                 refreshTabStrip()
             }
+
+            // Fullscreen video (YouTube, etc.): show the video surface in the overlay.
+            private var customView: View? = null
+            private var customViewCallback: WebChromeClient.CustomViewCallback? = null
+
+            override fun onShowCustomView(view: View?, callback: WebChromeClient.CustomViewCallback?) {
+                if (view == null) return
+                if (customView != null) {
+                    callback?.onCustomViewHidden()
+                    return
+                }
+                customView = view
+                customViewCallback = callback
+                val container = binding.fullscreenVideoContainer
+                container.visibility = View.VISIBLE
+                container.addView(view)
+                binding.bottomNav.visibility = View.GONE
+            }
+
+            override fun onHideCustomView() {
+                val custom = customView ?: return
+                val container = binding.fullscreenVideoContainer
+                container.removeView(custom)
+                container.visibility = View.GONE
+                customView = null
+                customViewCallback?.onCustomViewHidden()
+                customViewCallback = null
+                binding.bottomNav.visibility = View.VISIBLE
+            }
         }
 
         webView.addJavascriptInterface(jsInterface, "VrBrowser")
@@ -238,24 +267,34 @@ class MainActivity : ComponentActivity(), TabManager.TabFactory {
                 com.elbruz.vrvideo.ui.main.download.DownloadPromptDialog.show(this, detectedVideos)
             }
         }
-        // Draggable: first DOWN captures offset, MOVE follows finger, UP snaps back to an edge.
+        // Draggable via onTouch; on DOWN return false so taps still reach the
+        // click listener. A move past the slop threshold starts the drag.
+        val viewConfiguration = android.view.ViewConfiguration.get(this)
+        val slop = viewConfiguration.scaledTouchSlop
+        var dragging = false
         btn.setOnTouchListener { _, event ->
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     btn.tag = Pair(event.rawX - btn.x, event.rawY - btn.y)
-                    btn.animate().scaleX(1.1f).scaleY(1.1f).setDuration(100).start()
-                    true
+                    dragging = false
+                    false
                 }
                 MotionEvent.ACTION_MOVE -> {
-                    val (dx, dy) = btn.tag as Pair<Float, Float>
-                    btn.x = event.rawX - dx
-                    btn.y = event.rawY - dy
-                    true
+                    if (!dragging) {
+                        val dx = event.rawX - btn.x - (btn.tag as Pair<Float, Float>).first
+                        val dy = event.rawY - btn.y - (btn.tag as Pair<Float, Float>).second
+                        if (dx * dx + dy * dy > slop * slop) dragging = true
+                    }
+                    if (dragging) {
+                        val (offX, offY) = btn.tag as Pair<Float, Float>
+                        btn.x = event.rawX - offX
+                        btn.y = event.rawY - offY
+                    }
+                    dragging
                 }
                 MotionEvent.ACTION_UP -> {
-                    btn.animate().scaleX(1f).scaleY(1f).setDuration(100).start()
-                    snapToEdge(btn)
-                    true
+                    if (dragging) snapToEdge(btn)
+                    dragging
                 }
                 else -> false
             }

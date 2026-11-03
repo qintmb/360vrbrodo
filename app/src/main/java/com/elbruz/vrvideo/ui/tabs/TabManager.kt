@@ -2,6 +2,7 @@ package com.elbruz.vrvideo.ui.tabs
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.view.View
 import android.webkit.CookieManager
 import android.webkit.WebSettings
 import android.webkit.WebView
@@ -150,6 +151,9 @@ class TabManager(
             s.javaScriptCanOpenWindowsAutomatically = false
             s.useWideViewPort = true
             s.loadWithOverviewMode = true
+            s.setSupportMultipleWindows(false)
+            // Fix black video on YouTube/HTML5: enable hardware acceleration on the view itself.
+            webView.setLayerType(View.LAYER_TYPE_HARDWARE, null)
             s.allowFileAccess = false
             s.allowContentAccess = false
             s.allowFileAccessFromFileURLs = false

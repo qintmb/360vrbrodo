@@ -51,6 +51,11 @@
             android:theme="@style/Theme.VrVideo.NoActionBar" />
 
         <activity
+            android:name=".ui.main.vault.VaultActivity"
+            android:exported="false"
+            android:theme="@style/Theme.VrVideo.NoActionBar" />
+
+        <activity
             android:name=".ui.main.player.VideoPlayerActivity"
             android:exported="false"
             android:theme="@style/Theme.VrVideo.Fullscreen"
@@ -65,6 +70,16 @@
             android:name=".ui.main.player.VideoPlayerService"
             android:exported="false"
             android:foregroundServiceType="mediaPlayback" />
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
 
     </application>
 </manifest>

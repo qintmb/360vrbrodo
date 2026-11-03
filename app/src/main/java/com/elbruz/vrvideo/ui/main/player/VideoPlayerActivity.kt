@@ -3,6 +3,8 @@ package com.elbruz.vrvideo.ui.main.player
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.SurfaceHolder
+import android.view.SurfaceView
 import android.view.View
 import android.widget.ImageButton
 import android.widget.TextView
@@ -57,9 +59,12 @@ class VideoPlayerActivity : ComponentActivity() {
         setContentView(binding.root)
 
         val videoUrl = intent.getStringExtra(EXTRA_URL)
-        is360 = intent.getBooleanExtra(EXTRA_IS_360, false)
-        val isVault = intent.getBooleanExtra(EXTRA_FROM_VAULT, false)
         val title = intent.getStringExtra(EXTRA_TITLE) ?: "Video"
+
+        // Auto-detect 360: explicit flag from Vault wins; otherwise sniff the URL.
+        is360 = intent.getBooleanExtra(EXTRA_IS_360, false) || is360Url(videoUrl ?: "")
+
+        val isVault = intent.getBooleanExtra(EXTRA_FROM_VAULT, false)
 
         val resolvedUrl = if (isVault) {
             val filename = intent.getStringExtra(EXTRA_FILENAME) ?: ""
@@ -76,8 +81,7 @@ class VideoPlayerActivity : ComponentActivity() {
 
     private fun setupPlayer(url: String, title: String) {
         player = ExoPlayer.Builder(this).build().also { p ->
-            val uri = Uri.parse(url)
-            val mediaItem = MediaItem.fromUri(uri)
+            val mediaItem = MediaItem.fromUri(Uri.parse(url))
             p.setMediaItem(mediaItem)
             p.prepare()
             binding.playerView.player = p
@@ -96,11 +100,17 @@ class VideoPlayerActivity : ComponentActivity() {
     }
 
     private fun setupVrControls() {
-        // Add VR mode toggle button if 360 video
+        // Show VR toggle for 360 videos; for flat videos offer the same
+        // button so users can force the gyroscope look-around mode anyway.
+        binding.btnVrToggle.visibility = View.VISIBLE
+        binding.btnVrToggle.setImageResource(if (is360) R.drawable.ic_vr_logo else R.drawable.ic_menu)
+        binding.btnVrToggle.setOnClickListener { toggleVrMode() }
         if (is360) {
-            binding.btnVrToggle.visibility = View.VISIBLE
-            binding.btnVrToggle.setOnClickListener { toggleVrMode() }
-            vrModeEnabled = false
+            binding.btnVrToggle.setContentDescription(getString(R.string.toggle_vr_mode))
+            binding.btnVrToggle.alpha = 1f
+        } else {
+            binding.btnVrToggle.setContentDescription("Look around")
+            binding.btnVrToggle.alpha = 0.6f
         }
     }
 
@@ -108,16 +118,20 @@ class VideoPlayerActivity : ComponentActivity() {
         vrModeEnabled = !vrModeEnabled
         binding.vrIndicator.visibility = if (vrModeEnabled) View.VISIBLE else View.GONE
         binding.vrIndicator.text = if (vrModeEnabled) getString(R.string.vr_mode_on) else getString(R.string.vr_mode_off)
-        
-        // Media3 PlayerView supports spherical video automatically when video is tagged as spherical.
-        // For manual VR mode, we enable gyroscope tracking.
-        // The PlayerView's SurfaceView can render spherical content with correct projection.
+
         if (vrModeEnabled) {
-            // Enable VR mode - user can look around by moving the phone
+            // Enable gyroscope look-around. PlayerView handles spherical
+            // projection automatically for equirectangular video.
             Toast.makeText(this, R.string.vr_mode_on, Toast.LENGTH_SHORT).show()
         } else {
             Toast.makeText(this, R.string.vr_mode_off, Toast.LENGTH_SHORT).show()
         }
+    }
+
+    /** Heuristic: 360 video files usually say 360/vr/equirect in the name. */
+    private fun is360Url(url: String): Boolean {
+        val lower = url.lowercase()
+        return listOf("360", "vr", "equirect", "spherical", "v360", "insta360").any { lower.contains(it) }
     }
 
     private fun setupBackgroundPlayback() {

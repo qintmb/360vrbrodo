@@ -34,6 +34,26 @@
     <string name="incognito_mode">Incognito</string>
 
     <!-- Bottom bar -->
+    <string name="nav_browser">Browser</string>
+    <string name="nav_downloader">Downloader</string>
+    <string name="nav_vault">Vault</string>
+
+    <!-- Vault -->
+    <string name="vault_toggle_view">Toggle grid/list view</string>
+    <string name="vault_sort">Sort</string>
+    <string name="vault_filter_all">All</string>
+    <string name="vault_filter_vr">360° VR</string>
+    <string name="vault_filter_flat">Flat</string>
+    <string name="vault_empty">No downloaded videos yet</string>
+    <string name="vault_delete">Delete</string>
+    <string name="vault_share">Share</string>
+    <string name="vault_open">Open</string>
+    <string name="vault_deleted">Deleted</string>
+    <string name="sort_newest">Newest first</string>
+    <string name="sort_largest">Largest first</string>
+    <string name="sort_name">Name (A–Z)</string>
+    <string name="sort_duration">Longest first</string>
+
     <string name="action_back">Back</string>
     <string name="action_forward">Forward</string>
     <string name="action_home">Home</string>

@@ -5,6 +5,7 @@ import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.CookieManager
@@ -28,6 +29,7 @@ import com.elbruz.vrvideo.data.local.UserPrefs
 import com.elbruz.vrvideo.databinding.ActivityMainBinding
 import com.elbruz.vrvideo.ui.main.settings.SettingsActivity
 import com.elbruz.vrvideo.ui.main.download.DownloadsActivity
+import com.elbruz.vrvideo.ui.main.vault.VaultActivity
 import com.elbruz.vrvideo.ui.tabs.TabManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.launch
@@ -49,7 +51,10 @@ class MainActivity : ComponentActivity(), TabManager.TabFactory {
     /** Called by VrJsInterface when the page scanner finds videos. */
     fun onVideosDetected(items: List<VrJsInterface.VideoItem>) {
         detectedVideos = items
-        binding.btnFloatingDownload.visibility = View.VISIBLE
+        if (binding.btnFloatingDownload.visibility != View.VISIBLE) {
+            binding.btnFloatingDownload.visibility = View.VISIBLE
+        }
+        pulseDownloadButton()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -176,27 +181,102 @@ class MainActivity : ComponentActivity(), TabManager.TabFactory {
             override fun onQueryTextChange(newText: String?): Boolean = true
         })
 
+        // Address bar Back/Forward buttons
+        setupAddressBarControls()
+
         // Bottom Navigation
+        var lastBrowserClick = 0L
         bottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.navBack -> tabManager.goBack()
-                R.id.navForward -> tabManager.activeTab?.webView?.goForward()
-                R.id.navHome -> tabManager.loadUrl("https://www.google.com")
-                R.id.navTabs -> showTabSwitcher()
-                R.id.navDownloads -> startActivity(android.content.Intent(this, DownloadsActivity::class.java))
+                R.id.navBrowser -> {
+                    val now = System.currentTimeMillis()
+                    if (now - lastBrowserClick < 400) {
+                        showTabSwitcher()
+                    }
+                    lastBrowserClick = now
+                    true
+                }
+                R.id.navDownloader -> {
+                    startActivity(android.content.Intent(this, DownloadsActivity::class.java))
+                    true
+                }
+                R.id.navVault -> {
+                    startActivity(android.content.Intent(this, VaultActivity::class.java))
+                    true
+                }
+                else -> false
             }
-            true
         }
 
-        // Update initial tab count
         updateTabCount()
 
-        // Floating download pill — opens the download dialog for detected videos
-        binding.btnFloatingDownload.setOnClickListener {
+        // Floating download pill — draggable + opens download dialog
+        setupFloatingDownloadButton()
+    }
+
+    private fun setupAddressBarControls() {
+        binding.btnBack.setOnClickListener { tabManager.goBack() }
+        binding.btnForward.setOnClickListener { tabManager.activeTab?.webView?.goForward() }
+        // Update visibility when the page navigates
+        lifecycleScope.launch {
+            tabManager.activeTabIdFlow.collect {
+                val webView = tabManager.activeTab?.webView ?: return@collect
+                binding.btnBack.visibility = if (webView.canGoBack()) View.VISIBLE else View.GONE
+                binding.btnForward.visibility = if (webView.canGoForward()) View.VISIBLE else View.GONE
+            }
+        }
+    }
+
+    private fun setupFloatingDownloadButton() {
+        val btn = binding.btnFloatingDownload
+        btn.setOnClickListener {
             if (detectedVideos.isNotEmpty()) {
                 com.elbruz.vrvideo.ui.main.download.DownloadPromptDialog.show(this, detectedVideos)
             }
         }
+        // Draggable: first DOWN captures offset, MOVE follows finger, UP snaps back to an edge.
+        btn.setOnTouchListener { _, event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    btn.tag = Pair(event.rawX - btn.x, event.rawY - btn.y)
+                    btn.animate().scaleX(1.1f).scaleY(1.1f).setDuration(100).start()
+                    true
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    val (dx, dy) = btn.tag as Pair<Float, Float>
+                    btn.x = event.rawX - dx
+                    btn.y = event.rawY - dy
+                    true
+                }
+                MotionEvent.ACTION_UP -> {
+                    btn.animate().scaleX(1f).scaleY(1f).setDuration(100).start()
+                    snapToEdge(btn)
+                    true
+                }
+                else -> false
+            }
+        }
+    }
+
+    /** Slide the floating pill to the nearest screen edge so it never blocks content. */
+    private fun snapToEdge(btn: View) {
+        val root = btn.parent as? View ?: return
+        val maxX = root.width - btn.width
+        val targetX = if (btn.x < maxX / 2f) 8f else maxX - 8f
+        btn.animate().x(targetX).setDuration(150).start()
+    }
+
+    /** Pulse the pill a few times when new media is detected. */
+    fun pulseDownloadButton() {
+        val btn = binding.btnFloatingDownload
+        if (btn.visibility != View.VISIBLE) return
+        btn.animate().scaleX(1.12f).scaleY(1.12f).setDuration(180).withEndAction {
+            btn.animate().scaleX(1f).scaleY(1f).setDuration(180).withEndAction {
+                btn.animate().scaleX(1.12f).scaleY(1.12f).setDuration(180).withEndAction {
+                    btn.animate().scaleX(1f).scaleY(1f).setDuration(180).start()
+                }.start()
+            }.start()
+        }.start()
     }
 
     private fun setupTabObservers() {

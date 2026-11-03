@@ -12,16 +12,16 @@ import org.json.JSONObject
  * JavaScript bridge injected into every WebView page.
  *
  * Safety constraint: exposes ONLY `onVideosFound(...)` to receive
- * a JSON array of <video>/<source> URLs collected by a read-only
- * DOM scanner script. It cannot read cookies, page HTML, or
- * control navigation.
+ * a JSON array of media candidates collected by a read-only DOM +
+ * network-performance scanner script. It cannot read cookies, page
+ * HTML, or control navigation.
  */
 class VrJsInterface(
     private val activity: MainActivity,
 ) {
     companion object { private const val TAG = "VrJsInterface" }
 
-    /** Called from JS: receive detected video URLs. */
+    /** Called from JS: receive detected media URLs. */
     @JavascriptInterface
     fun onVideosFound(videoJsonArray: String) {
         activity.runOnUiThread {
@@ -70,12 +70,15 @@ class VrJsInterface(
                     poster = obj.optString("poster", ""),
                     width = obj.optInt("width", 0),
                     height = obj.optInt("height", 0),
+                    format = obj.optString("format", ""),
+                    estimatedBytes = obj.optLong("size", 0L),
+                    durationSec = obj.optLong("duration", 0L),
                 )
             }
         } catch (e: Exception) {
             Log.e(TAG, "Failed to parse video list from JS", e)
         }
-        return list
+        return list.filter { it.url.isNotBlank() }
     }
 
     /** Metadata extracted from the page by the injected scanner script. */
@@ -85,13 +88,19 @@ class VrJsInterface(
         val poster: String,
         val width: Int,
         val height: Int,
+        val format: String = "",
+        val estimatedBytes: Long = 0L,
+        val durationSec: Long = 0L,
     ) {
         val resolutionLabel: String
             get() = when {
-                width >= 1920 || height >= 1080 -> "HD 1080p+"
-                width >= 1280 || height >= 720 -> "HD 720p"
-                width >= 854 || height >= 480 -> "480p"
-                else -> "Mobile"
+                height >= 2160 -> "4K 2160p"
+                height >= 1440 -> "2K 1440p"
+                height >= 1080 || width >= 1920 -> "HD 1080p"
+                height >= 720 || width >= 1280 -> "HD 720p"
+                height >= 480 || width >= 854 -> "480p"
+                height > 0 -> "${height}p"
+                else -> "Unknown"
             }
     }
 
@@ -99,36 +108,74 @@ class VrJsInterface(
         (function(){
           if (window.__vrScannerInjected) return;
           window.__vrScannerInjected = true;
+
+          function ext(url){
+            var m = url.toLowerCase().match(/\.(mp4|webm|mkv|mov|avi|m3u8|mpd|mp3|m4a)(\?|#|$)/);
+            return m ? m[1] : '';
+          }
+          function pushVariant(vids, seen, src, title, poster, w, h, size, dur){
+            if (!src || seen[src]) return;
+            seen[src] = 1;
+            vids.push({
+              src: src, title: title || 'video', poster: poster || '',
+              width: w || 0, height: h || 0, format: ext(src),
+              size: size || 0, duration: dur || 0
+            });
+          }
+
           function collect(){
             var vids = [];
-            var cands = document.querySelectorAll('video, source, a[href]');
-            cands.forEach(function(el){
-              var src = '';
-              if (el.tagName === 'VIDEO' || el.tagName === 'SOURCE') {
-                src = el.src || el.getAttribute('src')||'';
-                var vid = el.closest('video');
-                vids.push({
-                  src:src,
-                  title: (vid&&vid.getAttribute('data-title'))||(el.getAttribute('title')||'video'),
-                  poster: vid?vid.poster:'',
-                  width: vid?vid.videoWidth:(el.getAttribute('width')||0),
-                  height: vid?vid.videoHeight:(el.getAttribute('height')||0)
-                });
-              } else {
-                src = el.getAttribute('href')||'';
+            var seen = {};
+
+            // 1) <video> elements with direct sources
+            document.querySelectorAll('video').forEach(function(v){
+              var src = v.currentSrc || v.src || '';
+              if (!src) {
+                var s = v.querySelector('source');
+                if (s) src = s.src || s.getAttribute('src') || '';
               }
-              if (src && el.tagName === 'A') {
-                var lower = src.toLowerCase();
-                if (lower.match(/\.(mp4|webm|mkv|mov|avi|mp3|m4a)(\?|$)/)) {
-                  vids.push({src:src, title:el.textContent.trim()||'download', poster:'', width:0, height:0});
-                }
+              pushVariant(vids, seen, src, v.getAttribute('data-title') || document.title,
+                          v.poster, v.videoWidth, v.videoHeight, 0, Math.round(v.duration||0));
+            });
+
+            // 2) <source> tags anywhere (HLS/DASH manifests included)
+            document.querySelectorAll('source').forEach(function(s){
+              var src = s.src || s.getAttribute('src') || '';
+              pushVariant(vids, seen, src, document.title, '', 0, 0, 0, 0);
+            });
+
+            // 3) direct media links
+            document.querySelectorAll('a[href]').forEach(function(a){
+              var href = a.href || '';
+              if (/\.(mp4|webm|mkv|mov|avi|mp3|m4a)(\?|#|$)/i.test(href)) {
+                pushVariant(vids, seen, href, (a.textContent||'').trim() || 'download',
+                            '', 0, 0, 0, 0);
               }
             });
+
+            // 4) network performance entries (catches blob/source-loaded streams)
+            try {
+              performance.getEntriesByType('resource').forEach(function(e){
+                var u = e.name || '';
+                if (/\.(mp4|webm|mkv|m3u8|mpd|m4s|ts)(\?|#|$)/i.test(u)) {
+                  pushVariant(vids, seen, u, document.title, '', 0, 0,
+                              Math.round(e.transferSize || 0), 0);
+                }
+              });
+            } catch(_){}
+
             if (vids.length) window.VrBrowser.onVideosFound(JSON.stringify(vids));
           }
+
           collect();
-          var observer = new MutationObserver(collect);
+          var t = null;
+          function debounced(){
+            if (t) return;
+            t = setTimeout(function(){ t = null; collect(); }, 1200);
+          }
+          var observer = new MutationObserver(debounced);
           observer.observe(document.body, {childList:true, subtree:true, attributes:true, attributeFilter:['src']});
+          setInterval(collect, 4000);
         })();
     """.trimIndent()
 }

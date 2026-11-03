@@ -15,68 +15,100 @@
         android:fitsSystemWindows="true"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <!-- Rounded Address Bar (ClintBrowser style) -->
-        <FrameLayout
-            android:id="@+id/addressBarContainer"
+        <!-- Top Toolbar: Back/Forward + Rounded Address Bar -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="12dp"
-            android:padding="0dp">
+            android:orientation="horizontal"
+            android:layout_margin="8dp"
+            android:padding="0dp"
+            android:gravity="center_vertical">
 
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:layout_marginHorizontal="4dp"
-                app:cardBackgroundColor="?attr/colorSurfaceVariant"
-                app:cardCornerRadius="24dp"
-                app:cardElevation="2dp">
+            <!-- Back/Forward buttons -->
+            <ImageButton
+                android:id="@+id/btnBack"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:src="@drawable/ic_back"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/action_back"
+                android:padding="10dp"
+                android:visibility="gone" />
 
-                <LinearLayout
+            <ImageButton
+                android:id="@+id/btnForward"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:src="@drawable/ic_forward"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/action_forward"
+                android:padding="10dp"
+                android:visibility="gone" />
+
+            <!-- Rounded Address Bar (ClintBrowser style) -->
+            <FrameLayout
+                android:id="@+id/addressBarContainer"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginHorizontal="8dp"
+                android:padding="0dp">
+
+                <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:paddingHorizontal="16dp">
+                    android:layout_height="48dp"
+                    android:layout_marginHorizontal="4dp"
+                    app:cardBackgroundColor="?attr/colorSurfaceVariant"
+                    app:cardCornerRadius="24dp"
+                    app:cardElevation="2dp">
 
-                    <!-- Lock/Info icon -->
-                    <ImageView
-                        android:id="@+id/ivSiteSecurity"
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:src="@android:drawable/ic_lock_lock"
-                        android:contentDescription="@string/site_security"
-                        android:tint="?attr/colorOnSurfaceVariant" />
-
-                    <!-- Search/URL field -->
-                    <androidx.appcompat.widget.SearchView
-                        android:id="@+id/searchBox"
-                        android:layout_width="0dp"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:layout_marginStart="8dp"
-                        android:iconifiedByDefault="false"
-                        android:queryHint="@string/hint_url_or_search"
-                        android:textColor="?attr/colorOnSurface"
-                        android:textColorHint="?attr/colorOnSurfaceVariant"
-                        app:iconifiedByDefault="false" />
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="16dp">
 
-                    <!-- Tab counter badge -->
-                    <TextView
-                        android:id="@+id/tvTabCount"
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:layout_marginStart="8dp"
-                        android:background="@drawable/bg_tab_count_badge"
-                        android:gravity="center"
-                        android:text="1"
-                        android:textColor="@color/md_theme_onPrimary"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
-                        android:visibility="gone" />
+                        <!-- Lock/Info icon -->
+                        <ImageView
+                            android:id="@+id/ivSiteSecurity"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@android:drawable/ic_lock_lock"
+                            android:contentDescription="@string/site_security"
+                            android:tint="?attr/colorOnSurfaceVariant" />
 
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-        </FrameLayout>
+                        <!-- Search/URL field -->
+                        <androidx.appcompat.widget.SearchView
+                            android:id="@+id/searchBox"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:layout_marginStart="8dp"
+                            android:iconifiedByDefault="false"
+                            android:queryHint="@string/hint_url_or_search"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textColorHint="?attr/colorOnSurfaceVariant"
+                            app:iconifiedByDefault="false" />
+
+                        <!-- Tab counter badge -->
+                        <TextView
+                            android:id="@+id/tvTabCount"
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:layout_marginStart="8dp"
+                            android:background="@drawable/bg_tab_count_badge"
+                            android:gravity="center"
+                            android:text="1"
+                            android:textColor="@color/md_theme_onPrimary"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:visibility="gone" />
+
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+            </FrameLayout>
+        </LinearLayout>
 
         <!-- WebView container -->
         <FrameLayout
@@ -85,13 +117,14 @@
             android:layout_height="0dp"
             android:layout_weight="1" />
 
-        <!-- Floating Video Download Pill (ClintBrowser style) -->
+        <!-- Floating Video Download Pill (ClintBrowser style) - Draggable -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnFloatingDownload"
             android:layout_width="wrap_content"
             android:layout_height="48dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="8dp"
+            android:layout_gravity="end|bottom"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="100dp"
             android:text="@string/action_download"
             app:icon="@drawable/ic_download"
             app:cornerRadius="24dp"
@@ -99,7 +132,7 @@
 
     </LinearLayout>
 
-    <!-- Bottom Navigation Bar (ClintBrowser style) -->
+    <!-- Bottom Navigation Bar (3 tabs: Browser, Downloader, Vault) -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNav"
         android:layout_width="match_parent"
